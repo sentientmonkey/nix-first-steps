@@ -1,13 +1,22 @@
 {
+  helloNix,
   pkgs ? import <nixpkgs> { },
 }:
 
-let
-  helloNix = pkgs.callPackage ./. { };
-in
 pkgs.dockerTools.buildImage {
   name = "hello-nix";
+  tag = helloNix.version;
+
+  copyToRoot = pkgs.buildEnv {
+    name = "image-root";
+    paths = with pkgs; [
+      helloNix
+      bashInteractive
+      coreutils
+    ];
+    pathsToLink = [ "/bin" ];
+  };
   config = {
-    Cmd = [ "${helloNix}/bin/hello-nix" ];
+    Cmd = [ "/bin/hello-nix" ];
   };
 }

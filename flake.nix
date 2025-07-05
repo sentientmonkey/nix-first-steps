@@ -13,6 +13,7 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+        helloNix = pkgs.callPackage ./hello-nix { inherit pkgs; };
       in
       {
         devShell = pkgs.mkShell {
@@ -21,10 +22,12 @@
             rustc
             rust-analyzer
             rustfmt
+            figlet
+            lolcat
           ];
         };
-        packages.default = pkgs.callPackage ./hello-nix { };
-        packages.dockerImage = pkgs.callPackage ./hello-nix/build-docker.nix { };
+        packages.default = helloNix;
+        packages.dockerImage = pkgs.callPackage ./hello-nix/build-docker.nix { inherit helloNix pkgs; };
       }
     );
 }
